@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+    <version>5.0</version>
+    <date>2022-05-20T10:52:23Z</date>
+    <groups>
+        <group>
+            <name>Templates</name>
+        </group>
+    </groups>
+    <templates>
+        <template>
+            <template>Template App APT Updates</template>
+            <name>Template App APT Updates</name>
+            <description>Template for tracking Available updates in Debian/Ubuntu Systems
+#Louis Blissett - V1.1 20/05/2022</description>
+            <groups>
+                <group>
+                    <name>Templates</name>
+                </group>
+            </groups>
+            <applications>
+                <application>
+                    <name>APT</name>
+                </application>
+            </applications>
+            <items>
+                <item>
+                    <name>Security Updates</name>
+                    <key>apt.security</key>
+                    <delay>60</delay>
+                    <applications>
+                        <application>
+                            <name>APT</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>Non-Critical Updates</name>
+                    <key>apt.updates</key>
+                    <delay>60</delay>
+                    <applications>
+                        <application>
+                            <name>APT</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>Reboot Required</name>
+                    <key>vfs.file.exists[/var/run/reboot-required]</key>
+                    <applications>
+                        <application>
+                            <name>APT</name>
+                        </application>
+                    </applications>
+                    <triggers>
+                        <trigger>
+                            <expression>{last()}&gt;0</expression>
+                            <name>Reboot Required on {HOST.NAME}</name>
+                            <priority>INFO</priority>
+                        </trigger>
+                    </triggers>
+                </item>
+            </items>
+        </template>
+    </templates>
+    <triggers>
+        <trigger>
+            <expression>{Template App APT Updates:apt.security.last()}&gt;0 and {Template App APT Updates:apt.updates.last()}&gt;0</expression>
+            <name>{ITEM.LASTVALUE1} Security &amp; {ITEM.LASTVALUE2} Regular Updates on {HOST.NAME}</name>
+            <priority>AVERAGE</priority>
+            <manual_close>YES</manual_close>
+        </trigger>
+        <trigger>
+            <expression>{Template App APT Updates:apt.updates.last()}&gt;0 and {Template App APT Updates:apt.security.last()}=0</expression>
+            <name>{ITEM.LASTVALUE} Regular Updates on {HOST.NAME}</name>
+            <priority>INFO</priority>
+            <manual_close>YES</manual_close>
+        </trigger>
+        <trigger>
+            <expression>{Template App APT Updates:apt.security.last()}&gt;0 and {Template App APT Updates:apt.updates.last()}=0</expression>
+            <name>{ITEM.LASTVALUE} Security Updates on {HOST.NAME}</name>
+            <priority>AVERAGE</priority>
+            <manual_close>YES</manual_close>
+        </trigger>
+    </triggers>
+    <graphs>
+        <graph>
+            <name>Available Updates</name>
+            <graph_items>
+                <graph_item>
+                    <sortorder>1</sortorder>
+                    <color>1A7C11</color>
+                    <item>
+                        <host>Template App APT Updates</host>
+                        <key>apt.updates</key>
+                    </item>
+                </graph_item>
+                <graph_item>
+                    <sortorder>2</sortorder>
+                    <color>F63100</color>
+                    <item>
+                        <host>Template App APT Updates</host>
+                        <key>apt.security</key>
+                    </item>
+                </graph_item>
+            </graph_items>
+        </graph>
+    </graphs>
+</zabbix_export>
